@@ -61,15 +61,16 @@
 (use-package cape
   :demand t
   :config
+  ;; Global fallback: just file completion
   (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-dabbrev-code))
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;; Make cape-capf-super the primary CAPF globally
-  (add-hook 'completion-at-point-functions
-            (cape-capf-super
-             (cape-company-to-capf #'company-dabbrev-code)
-             #'cape-file
-             #'cape-keyword)))
+
+  ;; Shared capf for lisp modes (dabbrev + keyword + file)
+  (defun my/lisp-capf ()
+    "CAPF for lisp modes with dabbrev, keyword, and file completion."
+    (cape-capf-super
+     (cape-company-to-capf #'company-dabbrev-code)
+     #'cape-keyword
+     #'cape-file)))
 
 ;;; corfu - modern completion UI (replaces company)
 (use-package corfu
@@ -206,12 +207,10 @@
                )
   (add-hook 'eglot-managed-mode-hook
             (lambda ()
-              ;; Merge eglot with cape-dabbrev and others
+              ;; Eglot first, cape-file as fallback
               (setq-local completion-at-point-functions
-                          (list (cape-capf-super
-                                 #'eglot-completion-at-point
-                                 (cape-company-to-capf #'company-dabbrev-code)
-                                 #'cape-file)))))
+                          (list #'eglot-completion-at-point
+                                #'cape-file))))
   :hook
   ((python-mode python-ts-mode clojure-mode js-mode) . eglot-ensure))
 
@@ -240,10 +239,7 @@
   (add-hook 'clojure-mode-hook
             (lambda ()
               (setq-local completion-at-point-functions
-                          (list (cape-capf-super
-                                 (cape-company-to-capf #'company-dabbrev-code)
-                                 #'cape-keyword
-                                 #'cape-file))))))
+                          (list (my/lisp-capf))))))
 (use-package cider)
 
 ;;; ==========================================================================
@@ -276,13 +272,11 @@
               (setq-local completion-at-point-functions
                           (list (cape-capf-super
                                  (cape-company-to-capf #'company-hy)
-                                 (cape-company-to-capf #'company-dabbrev-code)
-                                 #'cape-keyword
-                                 #'cape-file)))))
+                                 (my/lisp-capf))))))
   (add-hook 'inferior-hy-mode-hook
             (lambda ()
               (setq-local completion-at-point-functions
-                          (list (cape-company-to-capf #'company-dabbrev-code) #'cape-file)))))
+                          (list (my/lisp-capf))))))
 
 (add-to-list 'auto-mode-alist '("\\.lpy\\|.sy\\'" . hy-mode))
 
