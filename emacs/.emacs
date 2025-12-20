@@ -16,7 +16,7 @@
 (pcase system-type
   ('windows-nt
    (add-to-list 'default-frame-alist '(top . 0))
-   (add-to-list 'default-frame-alist '(left . 1270)))
+   (add-to-list 'default-frame-alist '(left . 640)))
   ('gnu/linux
    (add-to-list 'default-frame-alist '(top . 522))
    (add-to-list 'default-frame-alist '(left . 2720))))
