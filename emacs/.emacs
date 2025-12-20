@@ -201,10 +201,9 @@
   (add-hook 'eglot-managed-mode-hook
             (lambda ()
               ;; Merge eglot with cape-dabbrev and others
-              ;; Use cape-wrap-buster to ensure candidates are refreshed
               (setq-local completion-at-point-functions
                           (list (cape-capf-super
-                                 (cape-wrap-buster #'eglot-completion-at-point)
+                                 #'eglot-completion-at-point
                                  (cape-company-to-capf #'company-dabbrev-code)
                                  #'cape-file)))))
   :hook
