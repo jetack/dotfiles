@@ -3,9 +3,18 @@
 
 ;;; Code:
 ;;frame size
-;; (add-to-list 'default-frame-alist '(height . 56))
-;; (add-to-list 'default-frame-alist '(width . 85))
-;; (set-frame-position (selected-frame) 0 0)
+(add-to-list 'default-frame-alist '(height . 61))
+(add-to-list 'default-frame-alist '(width . 123))
+(pcase system-type
+  ('windows-nt
+   (add-to-list 'default-frame-alist '(top . 0))
+   (add-to-list 'default-frame-alist '(left . 1270)))
+  ('gnu/linux
+   (add-to-list 'default-frame-alist '(top . 522))
+   (add-to-list 'default-frame-alist '(left . 2720))))
+
+
+
 
 ;;; straight.el
 (setq package-enable-at-startup nil)
@@ -92,73 +101,39 @@
 ;;    '(rainbow-delimiters-depth-9-face ((t (:foreground "#70b2db"))))))
 
 
-;; lsp-mode
-(use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  (setq gc-cons-threshold (* 100 1024 1024)
-        read-process-output-max (* 1024 1024)
-        treemacs-space-between-root-nodes nil
-        company-idle-delay 0.0
-        company-minimum-prefix-length 1
-        lsp-lens-enable t
-        lsp-signature-auto-activate nil
-                                        ; lsp-enable-indentation nil ; uncomment to use cider indentation instead of lsp
-                                        ; lsp-enable-completion-at-point nil ; uncomment to use cider completion instead of lsp
-        )
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (clojure-mode . lsp)
-         (clojurescript-mode . lsp)
-         (clojurerec-mode . lsp)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
-
-;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
-;; if you are helm user
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
-;; if you are ivy user
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-
-;; optionally if you want to use debugger
-(use-package dap-mode)
-;; (use-package dap-LANGUAGE) to load the dap adapter for your language
-
-;; optional if you want which-key integration
-(use-package which-key
-  :config
-  (which-key-mode))
+;; ;; optional if you want which-key integration
+;; (use-package which-key
+;;   :config
+;;   (which-key-mode))
 
 ;; clojure
-(use-package clojure-mode)
+(use-package clojure-mode
+  :config
+  (add-hook 'clojure-mode-hook
+            (lambda ()
+              (add-to-list 'company-backends 'company-dabbrev-code))))
 (use-package cider)
 
+(add-hook 'js-mode-hook
+          (lambda ()
+            (setq js-indent-level 2)))
 
 ;; python
 (use-package conda
   :ensure t
   :init
-  ;; (setq conda-anaconda-home (expand-file-name "~/miniconda3"))
-  ;; (setq conda-env-home-directory (expand-file-name "~/miniconda3"))
+  (setq conda-anaconda-home (expand-file-name "~/miniconda3"))
+  (setq conda-env-home-directory (expand-file-name "~/miniconda3"))
   ;; (setq conda-anaconda-home (expand-file-name "c:/ProgramData/Miniconda3"))
-  ;; (conda-env-activate "base")
+  (conda-env-activate "base")
   )
 
-;;; lsp-pyright
-(use-package lsp-pyright
+;;; eglot
+(use-package eglot
   :ensure t
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-pyright)
-                         (lsp))))  ; or lsp-deferred
-
-;;; company-jedi
-(use-package company-jedi
-  :ensure t
-  :hook (python-mode . (lambda ()
-                         (add-to-list 'company-backends 'company-jedi))))
+  :init
+  (defalias 'start-lsp-server #'eglot)
+  (add-hook 'prog-mode-hook #'eglot-ensure))
 
 
 ;; treemacs
@@ -209,7 +184,7 @@
           treemacs-tag-follow-delay              1.5
           treemacs-user-mode-line-format         nil
           treemacs-user-header-line-format       nil
-          treemacs-width                         35
+          treemacs-width                         25
           treemacs-workspace-switch-cleanup      nil)
 
     ;; The default width and height of the icons is 22 pixels. If you are
@@ -238,7 +213,7 @@
 (use-package company
   :config
   (add-hook 'after-init-hook 'global-company-mode)
-  (setq company-minimum-prefix-length 1))
+  (setq company-minimum-prefix-length 2))
 
 ;;flycheck
 (use-package flycheck
@@ -258,15 +233,15 @@
           (let ((hook (intern (concat (symbol-name mode)
                                       "-mode-hook"))))
             (add-hook hook (lambda () (paredit-mode 1)))
-            (add-hook hook (lambda () (electric-pair-mode nil)))))
+            (add-hook hook (lambda () (electric-pair-mode 1)))))
         '(emacs-lisp inferior-lisp slime lisp-interaction scheme racket clojure hy inferior-hy)))
 
 ;;racket
 (use-package racket-mode)
 
-;;hylang settings
+;; lispy settings
 (use-package hy-mode
-  :straight (hy-mode :type git :host github :repo "jethack23/hy-mode")
+  :straight (hy-mode :type git :host github :repo "jetack/lpy-mode")
   :config
   (add-hook 'hy-mode-hook
             (lambda ()
@@ -276,7 +251,7 @@
             (lambda ()
               (company-mode 1))))
 
-
+(add-to-list 'auto-mode-alist '("\\.lpy\\|.sy\\'" . hy-mode))
 
 ;; rainbow-delimiters
 (use-package rainbow-delimiters
@@ -286,9 +261,7 @@
 ;;isort and black formatting
 (use-package py-isort
   :init
-  ;; (add-hook 'before-save-hook 'py-isort-before-save)
-  ;; (setq py-isort-options '("--lines=100"))
-  )
+  (add-hook 'before-save-hook 'py-isort-before-save))
 
 (use-package python-black
   :demand t
@@ -313,7 +286,7 @@
 (setq initial-scratch-message "")
 (display-time) ;;show time on status bar
 (transient-mark-mode t) ;; show selected area
-(global-linum-mode t) ;; show line numbers
+(global-display-line-numbers-mode t) ;; show line numbers
 (setq column-number-mode t) ;; show column number
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 2)
@@ -338,11 +311,17 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "MesloLGS Nerd Font Mono" :foundry "unknown" :slant normal :weight normal :height 128 :width normal)))))
+ '(default ((t (:family "MesloLGS Nerd Font Mono" :foundry "unknown" :slant normal :weight normal :height 139 :width normal)))))
 
 ;;korean environment
 (set-language-environment "Korean")
 (prefer-coding-system 'utf-8)
+
+;; (set-face-attribute 'default nil :font "Ubuntu Mono derivative Powerline-15")
+(set-face-attribute 'default nil :font "MesloLGS NF-13")
+(set-fontset-font t 'hangul (font-spec :name "D2Coding-15"))
+(set-fontset-font t 'unicode (font-spec :name "D2Coding-15") nil 'append)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
