@@ -56,7 +56,7 @@
 (use-package dabbrev
   :custom
   (dabbrev-ignored-buffer-names '("*Messages*" "*Buffer List*"))
-  (dabbrev-case-fold-search t)
+  (dabbrev-case-fold-search nil) ; Case-sensitive search to get distinct candidates
   (dabbrev-case-replace nil)
   (dabbrev-check-all-buffers t))
 
