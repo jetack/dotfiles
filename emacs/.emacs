@@ -87,7 +87,8 @@
   (:map corfu-map
         ("TAB" . corfu-insert)
         ([tab] . corfu-insert)
-        ("RET" . corfu-insert))
+        ("RET" . newline-and-indent)
+        ([return] . newline-and-indent))
   :config
   (global-corfu-mode)
   (corfu-popupinfo-mode))
