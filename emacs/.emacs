@@ -52,13 +52,6 @@
 (use-package compat
   :demand t)
 
-;;; dabbrev - basic expansion
-(use-package dabbrev
-  :custom
-  (dabbrev-ignored-buffer-names '("*Messages*" "*Buffer List*"))
-  (dabbrev-case-fold-search nil) ; Case-sensitive search to get distinct candidates
-  (dabbrev-case-replace nil)
-  (dabbrev-check-all-buffers t))
 
 ;;; company (needed for some backends like hy)
 (use-package company
@@ -69,12 +62,12 @@
   :demand t
   :config
   (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-dabbrev-code))
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   ;; Make cape-capf-super the primary CAPF globally
   (add-hook 'completion-at-point-functions
             (cape-capf-super
-             #'cape-dabbrev
+             (cape-company-to-capf #'company-dabbrev-code)
              #'cape-file
              #'cape-keyword)))
 
@@ -212,7 +205,7 @@
               (setq-local completion-at-point-functions
                           (list (cape-capf-super
                                  (cape-wrap-buster #'eglot-completion-at-point)
-                                 #'cape-dabbrev
+                                 (cape-company-to-capf #'company-dabbrev-code)
                                  #'cape-file)))))
   :hook
   ((python-mode python-ts-mode clojure-mode js-mode) . eglot-ensure))
@@ -243,7 +236,7 @@
             (lambda ()
               (setq-local completion-at-point-functions
                           (list (cape-capf-super
-                                 #'cape-dabbrev
+                                 (cape-company-to-capf #'company-dabbrev-code)
                                  #'cape-keyword
                                  #'cape-file))))))
 (use-package cider)
@@ -278,13 +271,13 @@
               (setq-local completion-at-point-functions
                           (list (cape-capf-super
                                  (cape-company-to-capf #'company-hy)
-                                 #'cape-dabbrev
+                                 (cape-company-to-capf #'company-dabbrev-code)
                                  #'cape-keyword
                                  #'cape-file)))))
   (add-hook 'inferior-hy-mode-hook
             (lambda ()
               (setq-local completion-at-point-functions
-                          (list #'cape-dabbrev #'cape-file)))))
+                          (list (cape-company-to-capf #'company-dabbrev-code) #'cape-file)))))
 
 (add-to-list 'auto-mode-alist '("\\.lpy\\|.sy\\'" . hy-mode))
 
