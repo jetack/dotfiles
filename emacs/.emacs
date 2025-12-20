@@ -52,15 +52,31 @@
 (use-package compat
   :demand t)
 
+;;; dabbrev - basic expansion
+(use-package dabbrev
+  :custom
+  (dabbrev-ignored-buffer-names '("*Messages*" "*Buffer List*"))
+  (dabbrev-case-fold-search t)
+  (dabbrev-case-replace nil)
+  (dabbrev-check-all-buffers t))
+
+;;; company (needed for some backends like hy)
+(use-package company
+  :demand t)
+
 ;;; cape - completion at point extensions
 (use-package cape
   :demand t
-  :custom
-  (dabbrev-upcase-means-case-search t)
-  (dabbrev-ignored-buffer-modes '(doc-view-mode pdf-view-mode tags-table-mode))
   :config
   (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev))
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;; Make cape-capf-super the primary CAPF globally
+  (add-hook 'completion-at-point-functions
+            (cape-capf-super
+             #'cape-dabbrev
+             #'cape-file
+             #'cape-keyword)))
 
 ;;; corfu - modern completion UI (replaces company)
 (use-package corfu
@@ -70,7 +86,10 @@
   (corfu-auto-delay 0.2)
   (corfu-auto-prefix 2)
   (corfu-cycle t)
-  (corfu-preselect 'first)  ; preselect first candidate
+  (corfu-preselect 'first)
+  (corfu-count 10)              ; Show more candidates
+  (corfu-quit-at-boundary nil)  ; Don't quit at pattern boundary
+  (corfu-quit-no-match t)       ; Quit if no match
   :bind
   (:map corfu-map
         ("TAB" . corfu-insert)
@@ -97,7 +116,8 @@
 (use-package orderless
   :custom
   (completion-styles '(orderless basic))
-  (completion-category-defaults nil))
+  (completion-category-defaults nil)
+  (completion-ignore-case t))
 
 ;;; marginalia - annotations in minibuffer
 (use-package marginalia
@@ -185,6 +205,15 @@
   :config
   (add-to-list 'eglot-server-programs
                '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio")))
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              ;; Merge eglot with cape-dabbrev and others
+              ;; Use cape-wrap-buster to ensure candidates are refreshed
+              (setq-local completion-at-point-functions
+                          (list (cape-capf-super
+                                 (cape-wrap-buster #'eglot-completion-at-point)
+                                 #'cape-dabbrev
+                                 #'cape-file)))))
   :hook
   ((python-mode python-ts-mode clojure-mode js-mode) . eglot-ensure))
 
@@ -213,7 +242,10 @@
   (add-hook 'clojure-mode-hook
             (lambda ()
               (setq-local completion-at-point-functions
-                          (list #'cape-dabbrev #'cape-keyword #'cape-file)))))
+                          (list (cape-capf-super
+                                 #'cape-dabbrev
+                                 #'cape-keyword
+                                 #'cape-file))))))
 (use-package cider)
 
 ;;; ==========================================================================
@@ -237,10 +269,6 @@
 
 (use-package racket-mode)
 
-;; company (required for company-hy backend)
-(use-package company
-  :demand t)
-
 ;; hy-mode (lispy)
 (use-package hy-mode
   :straight (hy-mode :type git :host github :repo "jetack/lpy-mode")
@@ -248,10 +276,11 @@
   (add-hook 'hy-mode-hook
             (lambda ()
               (setq-local completion-at-point-functions
-                          (list (cape-company-to-capf #'company-hy)
-                                #'cape-dabbrev
-                                #'cape-keyword
-                                #'cape-file))))
+                          (list (cape-capf-super
+                                 (cape-company-to-capf #'company-hy)
+                                 #'cape-dabbrev
+                                 #'cape-keyword
+                                 #'cape-file)))))
   (add-hook 'inferior-hy-mode-hook
             (lambda ()
               (setq-local completion-at-point-functions
