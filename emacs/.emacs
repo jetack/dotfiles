@@ -328,7 +328,7 @@
           treemacs-tag-follow-delay              1.5
           treemacs-user-mode-line-format         nil
           treemacs-user-header-line-format       nil
-          treemacs-width                         30
+          treemacs-width                         34
           treemacs-workspace-switch-cleanup      nil)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
