@@ -200,7 +200,9 @@
   (defalias 'start-lsp-server #'eglot)
   :config
   (add-to-list 'eglot-server-programs
-               '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio")))
+               ;; '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))  ;for better code
+               '((python-mode python-ts-mode) . ("pylsp"))  ;for less type warning
+               )
   (add-hook 'eglot-managed-mode-hook
             (lambda ()
               ;; Merge eglot with cape-dabbrev and others
