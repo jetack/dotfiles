@@ -151,6 +151,9 @@
 (global-unset-key "\C-z")
 (global-set-key "\C-z" 'advertised-undo)
 
+;;; Automatically follow symlinks to version-controlled files
+(setq vc-follow-symlinks t)
+
 ;;; windmove
 (use-package windmove
   :config
