@@ -183,17 +183,18 @@
 ;;; Python development
 ;;; ==========================================================================
 
-;; conda environment management
-(use-package conda
-  :init
-  (setq conda-anaconda-home (expand-file-name "~/miniconda3"))
-  (setq conda-env-home-directory (expand-file-name "~/miniconda3"))
-  ;; (setq conda-anaconda-home (expand-file-name "c:/ProgramData/Miniconda3"))
-  (conda-env-activate "base"))
-
-;;; envrc - direnv integration for per-project environments
+;;; envrc - direnv integration (works with uv virtual environments)
+;;; Use .envrc with: layout python-uv (requires direnv-stdlib extension)
+;;; Or simply: source .venv/bin/activate
 (use-package envrc
   :hook (after-init . envrc-global-mode))
+
+;;; pyvenv - manual venv activation (for uv projects without direnv)
+;;; Use M-x pyvenv-activate to activate .venv directory
+(use-package pyvenv
+  :config
+  (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
+  (pyvenv-mode 1))
 
 ;;; eglot with basedpyright (use built-in eglot)
 (use-package eglot
