@@ -194,7 +194,19 @@
 (use-package pyvenv
   :config
   (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
-  (pyvenv-mode 1))
+  (pyvenv-mode 1)
+
+  (defun my/auto-activate-venv ()
+    "Auto-activate .venv if it exists in project root."
+    (when-let* ((root (locate-dominating-file default-directory ".venv"))
+                (venv (expand-file-name ".venv" root)))
+      (when (and (file-directory-p venv)
+                 (not pyvenv-virtual-env))
+        (pyvenv-activate venv))))
+
+  (add-hook 'python-mode-hook #'my/auto-activate-venv)
+  (add-hook 'python-ts-mode-hook #'my/auto-activate-venv)
+  (add-hook 'hy-mode-hook #'my/auto-activate-venv))
 
 ;;; eglot with basedpyright (use built-in eglot)
 (use-package eglot
