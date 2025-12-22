@@ -206,7 +206,7 @@
 
   (add-hook 'python-mode-hook #'my/auto-activate-venv)
   (add-hook 'python-ts-mode-hook #'my/auto-activate-venv)
-  (add-hook 'hy-mode-hook #'my/auto-activate-venv))
+  (add-hook 'lpy-mode-hook #'my/auto-activate-venv))
 
 ;;; eglot with basedpyright (use built-in eglot)
 (use-package eglot
@@ -272,26 +272,26 @@
                                       "-mode-hook"))))
             (add-hook hook (lambda () (paredit-mode 1)))
             (add-hook hook (lambda () (electric-pair-mode 1)))))
-        '(emacs-lisp inferior-lisp slime lisp-interaction scheme racket clojure hy inferior-hy)))
+        '(emacs-lisp inferior-lisp slime lisp-interaction scheme racket clojure lpy inferior-lpy)))
 
 (use-package racket-mode)
 
-;; hy-mode (lispy)
-(use-package hy-mode
-  :straight (hy-mode :type git :host github :repo "jetack/lpy-mode")
+;; lpy-mode (lispy)
+(use-package lpy-mode
+  :straight (lpy-mode :type git :host github :repo "jetack/lpy-mode")
   :config
-  (add-hook 'hy-mode-hook
+  (add-hook 'lpy-mode-hook
             (lambda ()
               (setq-local completion-at-point-functions
                           (list (cape-capf-super
-                                 (cape-company-to-capf #'company-hy)
+                                 (cape-company-to-capf #'company-lpy)
                                  (my/lisp-capf))))))
-  (add-hook 'inferior-hy-mode-hook
+  (add-hook 'inferior-lpy-mode-hook
             (lambda ()
               (setq-local completion-at-point-functions
                           (list (my/lisp-capf))))))
 
-(add-to-list 'auto-mode-alist '("\\.lpy\\|.sy\\'" . hy-mode))
+(add-to-list 'auto-mode-alist '("\\.lpy\\|.sy\\'" . lpy-mode))
 
 ;;; ==========================================================================
 ;;; File browser
@@ -381,7 +381,7 @@
 (show-paren-mode 1)
 (setq show-paren-delay 0)
 (setq inhibit-startup-screen t)
-(setq initial-major-mode 'hy-mode)
+(setq initial-major-mode 'lpy-mode)
 (setq initial-scratch-message "")
 (display-time)
 (transient-mark-mode t)
