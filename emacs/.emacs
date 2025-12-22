@@ -78,7 +78,7 @@
   :custom
   (corfu-auto t)
   (corfu-auto-delay 0.2)
-  (corfu-auto-prefix 2)
+  (corfu-auto-prefix 1)
   (corfu-cycle t)
   (corfu-preselect 'first)
   (corfu-count 10)              ; Show more candidates
