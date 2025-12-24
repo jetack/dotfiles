@@ -368,6 +368,10 @@
   :config
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
+(use-package indent-bars
+  :config
+  (add-hook 'prog-mode-hook #'indent-bars-mode))
+
 (use-package multiple-cursors
   :config
   (global-set-key (kbd "M-n") 'mc/mark-next-like-this)
