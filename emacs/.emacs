@@ -183,8 +183,11 @@
   (set-face-attribute 'trailing-whitespace nil :foreground 'unspecified)
   (set-face-attribute 'mode-line-buffer-id nil :background 'unspecified)
   (set-face-attribute 'fringe nil :background 'unspecified)
-  (set-face-attribute 'diff-header nil :background 'unspecified)
-  (set-face-attribute 'diff-file-header nil :background 'unspecified))
+
+  ;; diff faces only exist after diff-mode is loaded
+  (with-eval-after-load 'diff-mode
+    (set-face-attribute 'diff-header nil :background 'unspecified)
+    (set-face-attribute 'diff-file-header nil :background 'unspecified)))
 
 ;;; ==========================================================================
 ;;; Python development
@@ -376,6 +379,7 @@
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
 (use-package indent-bars
+  :straight (indent-bars :type git :host github :repo "jdtsmith/indent-bars")
   :config
   (add-hook 'prog-mode-hook #'indent-bars-mode))
 
