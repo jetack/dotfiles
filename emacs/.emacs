@@ -177,7 +177,14 @@
    '(rainbow-delimiters-depth-6-face ((t (:foreground "#3f6176"))))
    '(rainbow-delimiters-depth-7-face ((t (:foreground "#887200"))))
    '(rainbow-delimiters-depth-8-face ((t (:foreground "#6e396c"))))
-   '(rainbow-delimiters-depth-9-face ((t (:foreground "#3f6176"))))))
+   '(rainbow-delimiters-depth-9-face ((t (:foreground "#3f6176")))))
+
+  ;; Fix theme faces that incorrectly use nil instead of 'unspecified
+  (set-face-attribute 'trailing-whitespace nil :foreground 'unspecified)
+  (set-face-attribute 'mode-line-buffer-id nil :background 'unspecified)
+  (set-face-attribute 'fringe nil :background 'unspecified)
+  (set-face-attribute 'diff-header nil :background 'unspecified)
+  (set-face-attribute 'diff-file-header nil :background 'unspecified))
 
 ;;; ==========================================================================
 ;;; Python development
