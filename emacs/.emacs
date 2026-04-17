@@ -228,14 +228,20 @@
                ;; '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))  ;for better code
                '((python-mode python-ts-mode) . ("pylsp"))  ;for less type warning
                )
+  (add-to-list 'eglot-server-programs
+               '(lpy-mode . ("/home/user/workspace/lispython/.venv/bin/python"
+                             "-m" "lispy.lsp")))
   (add-hook 'eglot-managed-mode-hook
             (lambda ()
-              ;; Eglot first, cape-file as fallback
               (setq-local completion-at-point-functions
-                          (list #'eglot-completion-at-point
-                                #'cape-file))))
+                          (if (derived-mode-p 'lpy-mode)
+                              (list (cape-capf-super
+                                     #'eglot-completion-at-point
+                                     (cape-company-to-capf #'company-lpy)
+                                     (my/lisp-capf)))
+                            (list #'eglot-completion-at-point #'cape-file)))))
   :hook
-  ((python-mode python-ts-mode clojure-mode js-mode) . eglot-ensure))
+  ((python-mode python-ts-mode clojure-mode js-mode lpy-mode) . eglot-ensure))
 
 ;;; flymake-ruff for Python linting (eglot uses flymake)
 (use-package flymake-ruff
