@@ -44,7 +44,8 @@ RUN pip install ipywidgets epc virtualenv
 RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 # jupyter password settings
-RUN echo -e '{\n  "NotebookApp": {\n    "password": "sha1:58c1d0061585:e2127287574c86fd8090ba22e89789a67975ef4a"\n  }\n}' > ~/.jupyter/jupyter_notebook_config.json
+ARG JUPYTER_PASSWORD_HASH=
+RUN if [ -n "$JUPYTER_PASSWORD_HASH" ]; then echo "{\"NotebookApp\": {\"password\": \"$JUPYTER_PASSWORD_HASH\"}}" > ~/.jupyter/jupyter_notebook_config.json; fi
 
 # when you want to use vim in lab
 #RUN jupyter labextension install jupyterlab_vim
