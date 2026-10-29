@@ -297,6 +297,9 @@
 
 (add-to-list 'auto-mode-alist '("\\.lpy\\|.sy\\'" . lpy-mode))
 
+;; buttercup: test framework for lpy-mode specs
+(use-package buttercup :defer t)
+
 ;;; ==========================================================================
 ;;; File browser
 ;;; ==========================================================================
