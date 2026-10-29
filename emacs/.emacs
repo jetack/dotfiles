@@ -237,8 +237,7 @@
                           (if (derived-mode-p 'lpy-mode)
                               (list (cape-capf-super
                                      #'eglot-completion-at-point
-                                     (cape-company-to-capf #'company-lpy)
-                                     (my/lisp-capf)))
+                                     #'lpy-nrepl-completion-at-point))
                             (list #'eglot-completion-at-point #'cape-file)))))
   :hook
   ((python-mode python-ts-mode clojure-mode js-mode lpy-mode) . eglot-ensure))
@@ -294,18 +293,7 @@
 
 ;; lpy-mode (lispy)
 (use-package lpy-mode
-  :straight (lpy-mode :type git :host github :repo "jetack/lpy-mode")
-  :config
-  (add-hook 'lpy-mode-hook
-            (lambda ()
-              (setq-local completion-at-point-functions
-                          (list (cape-capf-super
-                                 (cape-company-to-capf #'company-lpy)
-                                 (my/lisp-capf))))))
-  (add-hook 'inferior-lpy-mode-hook
-            (lambda ()
-              (setq-local completion-at-point-functions
-                          (list (my/lisp-capf))))))
+  :straight (lpy-mode :type git :host github :repo "jetack/lpy-mode"))
 
 (add-to-list 'auto-mode-alist '("\\.lpy\\|.sy\\'" . lpy-mode))
 
