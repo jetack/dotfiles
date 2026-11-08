@@ -112,6 +112,13 @@
   :custom
   (completion-styles '(orderless basic))
   (completion-category-defaults nil)
+  ;; Server-filtered candidates must not be re-filtered by orderless.
+  ;; Pinned here so it holds regardless of load order: the nil above
+  ;; empties the category defaults, which eglot and lpy-mode only
+  ;; re-add when they load.
+  (completion-category-overrides
+   '((eglot-capf (styles eglot--dumb-flex))
+     (lpy-nrepl (styles lpy-nrepl-passthrough))))
   (completion-ignore-case t))
 
 ;;; marginalia - annotations in minibuffer
