@@ -233,11 +233,8 @@
                              "-m" "lispy.lsp")))
   (add-hook 'eglot-managed-mode-hook
             (lambda ()
-              (setq-local completion-at-point-functions
-                          (if (derived-mode-p 'lpy-mode)
-                              (list (cape-capf-super
-                                     #'eglot-completion-at-point
-                                     #'lpy-nrepl-completion-at-point))
+              (unless (derived-mode-p 'lpy-mode)
+                (setq-local completion-at-point-functions
                             (list #'eglot-completion-at-point #'cape-file)))))
   :hook
   ((python-mode python-ts-mode clojure-mode js-mode lpy-mode) . eglot-ensure))
