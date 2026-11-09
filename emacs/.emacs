@@ -163,6 +163,13 @@
 ;;; Automatically follow symlinks to version-controlled files
 (setq vc-follow-symlinks t)
 
+;;; Reload buffers when their files change on disk (e.g. edits by agents).
+;;; Buffers with unsaved changes are never reverted.
+;;; Set before enabling the mode: these options are read when it starts.
+(setq auto-revert-avoid-polling t              ; file notifications where available
+      global-auto-revert-non-file-buffers t)   ; also refresh Dired and similar
+(global-auto-revert-mode 1)
+
 ;;; windmove
 (use-package windmove
   :config
